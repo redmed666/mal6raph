@@ -32,14 +32,13 @@ In order to be able to analyze data quite efficiently, I had to do some tradeoff
 * All the functions are not taken into account, only the ones with a size greater than the threshold defined in config.json
 * Same thing for the strings
 
-## How to run it?
+## How to use it?
 `./gradlew build && ./gradlew jar`
 
 In one terminal:
 `java -jar build/libs/mal6raph.jar --config config.json`
 
 In another one:
-
 ```bash
 docker run \
     --publish=7474:7474 --publish=7687:7687 \
@@ -49,6 +48,9 @@ docker run \
 ```
 
 Please, note that you need to configure first your neo4j database (just go to the webpage and enter your new password which is the same that the one in config.json)
+
+Go to http://localhost:8080 and upload your samples.
+To find similar functions between a sample and the ones in the db, go to http://localhost:8080/sample/\<sha256Sample\>
 
 
 ## TODO
