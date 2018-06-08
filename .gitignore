@@ -7,3 +7,4 @@ neo4j/
 target/
 upload-dir/
 .classpath
+**/.DS_Store
