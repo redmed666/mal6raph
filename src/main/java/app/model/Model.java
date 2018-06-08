@@ -137,8 +137,8 @@ public class Model implements AutoCloseable {
         float more = size * (1.0f - percentDiffSize);
         float less = size * (1.0f + percentDiffSize);
         String query = String.format(
-                "MATCH (s:Sample {sha256:'%s'}), (f:Function) WHERE f.size <= %d AND f.size >= %d AND NOT (s)-[:CALLS]->(f) RETURN f\n",
-                sha256Sample, (int) less, (int) more);
+                "MATCH (s:Sample {sha256:'%s'}), (f:Function), (f2:Function {sha256:'%s'}) WHERE f.size <= %d AND f.size >= %d AND NOT (s)-[:CALLS]->(f) AND NOT (f)-[:SIMILAR_TO]->(f2) AND NOT (f2)-[:SIMILAR_TO]->(f) RETURN f\n",
+                sha256Sample, function.getSha256(), (int) less, (int) more);
         return query;
     }
 
