@@ -17,7 +17,14 @@ Different types of links:
 * CALLS: samples calls this function
 * SIMILAR_TO: function is similar to another one.
 
-<img src="./docs/img/graph.png">
+![Alt text](./docs/img/graph.png?raw=true "Result of a query after analysis")
+
+Result presented here is a result from the query: 
+```bash
+MATCH (s1:Sample)-[:CALLS]->(f1:Function)-[:SIMILAR_TO]->(f2:Function)<-[:CALLS]-(s2:Sample) RETURN s1,f1,s2,f2
+```
+
+in the neo4j web application.
 
 ## Tradeoffs
 In order to be able to analyze data quite efficiently, I had to do some tradeoffs:
