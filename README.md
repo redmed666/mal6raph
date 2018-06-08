@@ -17,8 +17,7 @@ Different types of links:
 * CALLS: samples calls this function
 * SIMILAR_TO: function is similar to another one.
 
-![Alt text](./docs/img/graph.svg)
-<img src="./docs/img/graph.svg">
+![Alt text](./graph.svg)
 
 ## Tradeoffs
 In order to be able to analyze data quite efficiently, I had to do some tradeoffs:
