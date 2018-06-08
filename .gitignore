@@ -1,0 +1,9 @@
+.gradle/
+.settings/
+.vscode/
+bin/
+build/
+neo4j/
+target/
+upload-dir/
+.classpath
