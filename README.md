@@ -53,11 +53,15 @@ Go to http://localhost:8080 and upload your samples.
 To find similar functions between a sample and the ones in the db, go to http://localhost:8080/sample/\<sha256Sample\>
 
 
+## Frontend
+Because Mal6raph is only an API, it's kinda useful to have a frontend as well in order to use the analysis done.
+You can find one at [here](https://github.com/redmed666/mal6raph-client).
+
 ## TODO
 
 * [ ] Implementation of different types of comparison (strings, imports, exports)
-* [ ] Front end
-    * [ ] Creation of a front end (it will surely be in another repo)
+* [x] Front end
+    * [x] Creation of a front end (it will surely be in another repo)
     * [ ] Possibility to upload FLIRT signatures
     * [ ] Possibility to upload radare2 scripts
 * [ ] Creation of YARA rules based on matches
