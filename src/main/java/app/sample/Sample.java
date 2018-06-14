@@ -1,11 +1,21 @@
 package app.sample;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import com.google.gson.JsonArray;
 
+import org.neo4j.ogm.annotation.GeneratedValue;
+import org.neo4j.ogm.annotation.Id;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
+
+@NodeEntity
 public class Sample {
+    @Id
+    @GeneratedValue
+    private Long id;
     private String sha256;
     private String md5;
     private List<Function> functions;
@@ -14,7 +24,9 @@ public class Sample {
     private JsonArray exports;
     private String arch;
     private int bits;
-    private int id;
+
+    @Relationship(type = "CALLS", direction = Relationship.OUTGOING)
+    private List<Calls> calls;
 
     /**
      * @param arch the arch to set
@@ -75,14 +87,14 @@ public class Sample {
     /**
      * @param id the id to set
      */
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     /**
      * @return the id
      */
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -140,6 +152,21 @@ public class Sample {
      */
     public HashSet<String> getStrings() {
         return strings;
+    }
+
+    /**
+     * @return the calls
+     */
+    public List<Calls> getCalls() {
+        return calls;
+    }
+
+    public void addCalls(Calls call) {
+        if (this.calls == null) {
+            this.calls = new ArrayList<>();
+        }
+
+        this.calls.add(call);
     }
 
 }

@@ -5,7 +5,7 @@ import java.util.List;
 public class Function {
     private String md5;
     private String sha256;
-    private int size;
+    private Long size;
     private String arch;
     private int bits;
     private List<String> ops;
@@ -98,14 +98,14 @@ public class Function {
     /**
      * @param size the size to set
      */
-    public void setSize(int size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 
     /**
      * @return the size
      */
-    public int getSize() {
+    public Long getSize() {
         return size;
     }
 

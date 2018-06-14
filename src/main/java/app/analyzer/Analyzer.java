@@ -86,7 +86,7 @@ public class Analyzer {
 
         List<Thread> threads = new ArrayList<Thread>();
         for (int i = 0; i < config.get("NUMBER_THREADS").getAsInt(); i++) {
-            AnalyzeFctSimilThread runnable = new AnalyzeFctSimilThread(queue, source, similarities,
+            AnalyzeFunctionSimilThread runnable = new AnalyzeFunctionSimilThread(queue, source, similarities,
                     config.get("THRESHOLD_SIMILARITY").getAsFloat());
             Thread thread = new Thread(runnable);
             thread.start();

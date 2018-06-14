@@ -43,11 +43,11 @@ public class AnalyzeFunctionThread implements Runnable {
                     function.setOffset(offset);
                     r2p.cmd(String.format("af @ %d", offset));
                     String sha256Fn = r2p.cmd(String.format("ph sha256 %d @ %d", functionInfo.get("size").getAsInt(),
-                            functionInfo.get("offset").getAsInt())).toUpperCase();
+                            functionInfo.get("offset").getAsInt())).toUpperCase().replace("\n", "");
 
                     if (!sha256Fns.contains(sha256Fn)) {
                         String md5Fn = r2p.cmd(String.format("ph md5 %d @ %d", functionInfo.get("size").getAsInt(),
-                                functionInfo.get("offset").getAsInt())).toUpperCase();
+                                functionInfo.get("offset").getAsInt())).toUpperCase().replace("\n", "");
 
                         function.setSha256(sha256Fn);
                         function.setMd5(md5Fn);
@@ -64,7 +64,7 @@ public class AnalyzeFunctionThread implements Runnable {
                             }
                         }
                         function.setOps(fnOps);
-                        function.setSize(functionInfo.get("size").getAsInt());
+                        function.setSize(functionInfo.get("size").getAsLong());
                         function.setOffset(functionInfo.get("offset").getAsInt());
                         functions.add(function);
                     }
@@ -73,7 +73,7 @@ public class AnalyzeFunctionThread implements Runnable {
             }
             r2p.quit();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ANALYZEFCTTHREAD: " + e.getMessage());
         }
     }
 }

@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import app.sample.Function;
 
-public class AnalyzeFctSimilThread implements Runnable {
+public class AnalyzeFunctionSimilThread implements Runnable {
     Thread thread;
     private ConcurrentLinkedQueue<Function> queue;
     private Function function;
@@ -16,7 +16,7 @@ public class AnalyzeFctSimilThread implements Runnable {
     private List<Map<String, Float>> similarities;
     private Float thresholdSimil;
 
-    AnalyzeFctSimilThread(ConcurrentLinkedQueue<Function> queue, Function functionFromSample,
+    AnalyzeFunctionSimilThread(ConcurrentLinkedQueue<Function> queue, Function functionFromSample,
             List<Map<String, Float>> similarities, Float thresholdSimil) {
         this.queue = queue;
         this.function = functionFromSample;
@@ -73,7 +73,7 @@ public class AnalyzeFctSimilThread implements Runnable {
                 }
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("ANALYZESIMILFCT: " + e.getMessage());
         }
     }
 }
