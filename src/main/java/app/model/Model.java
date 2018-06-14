@@ -109,6 +109,7 @@ public class Model implements AutoCloseable {
                     query += String.format("SET function_%s.bits = %d\n", fnSha256, function.getBits());
                     query += String.format("SET function_%s.ops = %s\n", fnSha256, function.getOps().toString());
                     query += String.format("SET function_%s.offset = %d\n", fnSha256, function.getOffset());
+                    query += String.format("SET function_%s.already_anal_by = []\n", fnSha256);
                     query += String.format("CREATE (sample_%s)-[:CALLS]->(function_%s)\n", sample.getSha256(),
                             fnSha256);
                 }
@@ -156,18 +157,17 @@ public class Model implements AutoCloseable {
         float more = size * (1.0f - percentDiffSize);
         float less = size * (1.0f + percentDiffSize);
         String query = String.format(
-                "MATCH (s:Sample {sha256:'%s'}), (f:Function), (f2:Function {sha256:'%s'}) WHERE f.size <= %d AND f.size >= %d AND NOT (s)-[:CALLS]->(f) AND NOT (f)-[:SIMILAR_TO]->(f2) AND NOT (f2)-[:SIMILAR_TO]->(f) RETURN f\n",
+                "MATCH (s:Sample {sha256:'%s'}), (f1:Function), (f2:Function {sha256:'%s'}) WHERE f1.size <= %d AND f1.size >= %d AND NOT (s)-[:CALLS]->(f1) AND NOT (f1)-[:SIMILAR_TO]-(f2) AND (NOT f2.sha256 IN f1.already_anal_by) AND (NOT f1.sha256 in f2.already_anal_by) SET f1.already_anal_by = f1.already_anal_by + f2.sha256 SET f2.already_anal_by = f2.already_anal_by + f1.sha256 RETURN f1\n",
                 sha256Sample, function.getSha256(), (int) less, (int) more);
         return query;
     }
 
     public String createQueryFunctionsSimilar(String sha256FnAnalyzed, String sha256FnComparedTo, Float similarity) {
         String query = String.format(
-                "MATCH (function_%s:Function {sha256:'%s'}), (function_%s:Function {sha256:'%s'}) WHERE NOT (function_%s)-[:SIMILAR_TO]->(function_%s) OR NOT (function_%s)-[:SIMILAR_TO]->(function_%s)\n",
-                sha256FnAnalyzed, sha256FnAnalyzed, sha256FnComparedTo, sha256FnComparedTo, sha256FnAnalyzed,
-                sha256FnComparedTo, sha256FnComparedTo, sha256FnAnalyzed);
-        query += String.format(Locale.ROOT, "MERGE (function_%s)-[:SIMILAR_TO {similarity: %f}]->(function_%s)\n",
-                sha256FnAnalyzed, similarity, sha256FnComparedTo);
+                "MATCH (function_1:Function {sha256:'%s'}), (function_2:Function {sha256:'%s'}) WHERE NOT (function_1)-[:SIMILAR_TO]-(function_2) AND NOT ID(function_1) = ID(function_2)\n",
+                sha256FnAnalyzed, sha256FnComparedTo);
+        query += String.format(Locale.ROOT, "MERGE (function_1)-[:SIMILAR_TO {similarity: %f}]->(function_2)\n",
+                similarity);
 
         return query;
     }

@@ -204,19 +204,20 @@ public class FileUploadController {
 
                 functionsSameSize.add(fctSameSize);
             }
+            if (!functionsSameSize.isEmpty()) {
+                List<Map<String, Float>> similarities = new ArrayList<Map<String, Float>>();
+                try {
+                    anal.analyzeSimil(function, functionsSameSize, similarities, config);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
 
-            List<Map<String, Float>> similarities = new ArrayList<Map<String, Float>>();
-            try {
-                anal.analyzeSimil(function, functionsSameSize, similarities, config);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-            for (Map<String, Float> similarity : similarities) {
-                similarity.forEach((key, value) -> {
-                    String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), key, value);
-                    neo4jDb.sendQuery(queryFcnSimil);
-                });
+                for (Map<String, Float> similarity : similarities) {
+                    similarity.forEach((key, value) -> {
+                        String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), key, value);
+                        neo4jDb.sendQuery(queryFcnSimil);
+                    });
+                }
             }
         }
 
