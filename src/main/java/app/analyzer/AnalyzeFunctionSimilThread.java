@@ -29,13 +29,12 @@ public class AnalyzeFunctionSimilThread implements Runnable {
         try {
             while (!queue.isEmpty()) {
                 Function fctFromDb = queue.remove();
-                List<Long> minHashes = fctFromDb.getMinHashes();
-                List<String> a = new ArrayList<String>();
-                List<String> b = new ArrayList<String>();
+                List<Long> minHashes = function.getMinHashes();
+                List<Long> minHashesDb = fctFromDb.getMinHashes();
                 float result = 0.0f;
 
-                for (Long hash : this.function.getMinHashes()) {
-                    if (minHashes.indexOf(hash) != -1) {
+                for (int i = 0; i < minHashes.size(); i++) {
+                    if (minHashes.get(i) == minHashesDb.get(i)) {
                         result += 1.0f;
                     }
                 }

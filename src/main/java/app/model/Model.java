@@ -165,19 +165,11 @@ public class Model implements AutoCloseable {
     }
 
     public String createQueryGetSimilHashes(Function function, String sha256Sample) {
-        String query = String.format("MATCH (f:Function), (s:Sample {sha256:'%s'}) WHERE ", sha256Sample);
-        List<Long> minHashes = function.getMinHashes();
-        for (int i = 0; i < minHashes.size(); i++) {
-
-            Long hash = minHashes.get(i);
-            if (i == minHashes.size() - 1) {
-                query += String.format("%d in f.minHashes ", hash);
-            } else {
-                query += String.format("%d in f.minHashes OR ", hash);
-            }
-        }
-        query += String.format("AND NOT (s)-[:CALLS]->(f) ");
-        query += "RETURN f";
+        String query = String.format(
+                "MATCH (f1:Function {sha256:'%s'}), (s:Sample {sha256:'%s'}), (f2:Function) WHERE f2.minHashes = f1.minHashes",
+                function.getSha256(), sha256Sample);
+        query += String.format(" AND NOT (s)-[:CALLS]->(f2) ");
+        query += " RETURN f2";
         return query;
     }
 

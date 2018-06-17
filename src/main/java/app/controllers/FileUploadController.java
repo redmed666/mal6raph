@@ -194,7 +194,7 @@ public class FileUploadController {
 
             while (rFunctionSameHash.hasNext()) {
                 Map<String, Object> rFunctionHash = rFunctionSameHash.next();
-                Map<String, Object> fHash = (Map<String, Object>) rFunctionHash.get("f");
+                Map<String, Object> fHash = (Map<String, Object>) rFunctionHash.get("f2");
 
                 Function fctSameHash = new Function();
                 fctSameHash.setMd5((String) fHash.get("md5"));
@@ -207,18 +207,10 @@ public class FileUploadController {
                 functionsSameHash.add(fctSameHash);
             }
             if (!functionsSameHash.isEmpty()) {
-                List<Map<String, Float>> similarities = new ArrayList<Map<String, Float>>();
-                try {
-                    anal.analyzeSimil(function, functionsSameHash, similarities, config);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
-
-                for (Map<String, Float> similarity : similarities) {
-                    similarity.forEach((key, value) -> {
-                        String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), key, value);
-                        neo4jDb.sendQuery(queryFcnSimil);
-                    });
+                for (Function fn : functionsSameHash) {
+                    String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), fn.getSha256(),
+                            1.0f);
+                    neo4jDb.sendQuery(queryFcnSimil);
                 }
             }
         }
