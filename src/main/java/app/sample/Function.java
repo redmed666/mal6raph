@@ -10,6 +10,7 @@ public class Function {
     private int bits;
     private List<String> ops;
     private int offset;
+    private List<Long> minHashes;
 
     /**
      * @param arch the arch to set
@@ -107,6 +108,20 @@ public class Function {
      */
     public Long getSize() {
         return size;
+    }
+
+    /**
+     * @return the minHashes
+     */
+    public List<Long> getMinHashes() {
+        return minHashes;
+    }
+
+    /**
+     * @param minHashes the minHashes to set
+     */
+    public void setMinHashes(List<Long> minHashes) {
+        this.minHashes = minHashes;
     }
 
 }

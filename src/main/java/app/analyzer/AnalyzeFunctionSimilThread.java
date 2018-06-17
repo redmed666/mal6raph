@@ -29,42 +29,18 @@ public class AnalyzeFunctionSimilThread implements Runnable {
         try {
             while (!queue.isEmpty()) {
                 Function fctFromDb = queue.remove();
-                List<String> opsFromDb = fctFromDb.getOps();
+                List<Long> minHashes = fctFromDb.getMinHashes();
                 List<String> a = new ArrayList<String>();
                 List<String> b = new ArrayList<String>();
+                float result = 0.0f;
 
-                if (opsFromDb.size() < ops.size()) {
-                    a = opsFromDb;
-                    b = ops;
-                } else {
-                    a = ops;
-                    b = opsFromDb;
-                }
-                int i = 0;
-                int j = 0;
-                Float result = 0.0f;
-                float count = 0;
-
-                for (; i < a.size(); i++) {
-                    j = i;
-                    if (a.get(i).equals(b.get(j))) {
-                        count++;
-                    } else {
-                        while (true) {
-
-                            j++;
-                            if (j >= b.size()) {
-                                j = i;
-                                break;
-                            } else if (a.get(i).equals(b.get(j))) {
-                                count += 1.0f / ((j - i) * (j - i));
-                                break;
-                            }
-                        }
+                for (Long hash : this.function.getMinHashes()) {
+                    if (minHashes.indexOf(hash) != -1) {
+                        result += 1.0f;
                     }
                 }
 
-                result = ((float) count / a.size());
+                result = result / minHashes.size();
 
                 if (result > thresholdSimil) {
                     Map<String, Float> simil = new HashMap<String, Float>();

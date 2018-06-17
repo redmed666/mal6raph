@@ -183,31 +183,33 @@ public class FileUploadController {
             function.setSha256(fnSha256);
             function.setOps(ops);
             function.setSize((Long) f.get("size"));
+            function.setMinHashes((List<Long>) f.get("minHashes"));
             functions.add(function);
 
-            String queryFctSimil = neo4jDb.createQueryGetFunctionsSameSize(function,
-                    config.get("DIFF_SIZE_FCT").getAsFloat(), sha256Sample);
+            String queryFctSimil = neo4jDb.createQueryGetSimilHashes(function, sha256Sample);
 
-            Iterator<Map<String, Object>> rFunctionsSize = neo4jDb.sendQuery(queryFctSimil);
-            List<Function> functionsSameSize = new ArrayList<Function>();
+            Iterator<Map<String, Object>> rFunctionSameHash = neo4jDb.sendQuery(queryFctSimil);
+            List<Function> functionsSameHash = new ArrayList<Function>();
             Analyzer anal = new Analyzer();
 
-            while (rFunctionsSize.hasNext()) {
-                Map<String, Object> rFunctionSize = rFunctionsSize.next();
-                Map<String, Object> fSize = (Map<String, Object>) rFunctionSize.get("f");
+            while (rFunctionSameHash.hasNext()) {
+                Map<String, Object> rFunctionHash = rFunctionSameHash.next();
+                Map<String, Object> fHash = (Map<String, Object>) rFunctionHash.get("f");
 
-                Function fctSameSize = new Function();
-                fctSameSize.setMd5((String) fSize.get("md5"));
-                fctSameSize.setSha256((String) fSize.get("sha256"));
-                List<String> opsFctSimil = (List<String>) fSize.get("ops");
-                fctSameSize.setOps(opsFctSimil);
+                Function fctSameHash = new Function();
+                fctSameHash.setMd5((String) fHash.get("md5"));
+                fctSameHash.setSha256((String) fHash.get("sha256"));
+                List<String> opsFctSimil = (List<String>) fHash.get("ops");
+                fctSameHash.setOps(opsFctSimil);
+                List<Long> minHashes = (List<Long>) fHash.get("minHashes");
+                fctSameHash.setMinHashes(minHashes);
 
-                functionsSameSize.add(fctSameSize);
+                functionsSameHash.add(fctSameHash);
             }
-            if (!functionsSameSize.isEmpty()) {
+            if (!functionsSameHash.isEmpty()) {
                 List<Map<String, Float>> similarities = new ArrayList<Map<String, Float>>();
                 try {
-                    anal.analyzeSimil(function, functionsSameSize, similarities, config);
+                    anal.analyzeSimil(function, functionsSameHash, similarities, config);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }

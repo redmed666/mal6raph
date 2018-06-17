@@ -110,6 +110,8 @@ public class Model implements AutoCloseable {
                     query += String.format("SET function_%s.ops = %s\n", fnSha256, function.getOps().toString());
                     query += String.format("SET function_%s.offset = %d\n", fnSha256, function.getOffset());
                     query += String.format("SET function_%s.already_anal_by = []\n", fnSha256);
+                    query += String.format("SET function_%s.minHashes = %s\n", fnSha256,
+                            function.getMinHashes().toString());
                     query += String.format("CREATE (sample_%s)-[:CALLS]->(function_%s)\n", sample.getSha256(),
                             fnSha256);
                 }
@@ -159,6 +161,23 @@ public class Model implements AutoCloseable {
         String query = String.format(
                 "MATCH (s:Sample {sha256:'%s'}), (f1:Function), (f2:Function {sha256:'%s'}) WHERE f1.size <= %d AND f1.size >= %d AND NOT (s)-[:CALLS]->(f1) AND NOT (f1)-[:SIMILAR_TO]-(f2) AND (NOT f2.sha256 IN f1.already_anal_by) AND (NOT f1.sha256 in f2.already_anal_by) SET f1.already_anal_by = f1.already_anal_by + f2.sha256 SET f2.already_anal_by = f2.already_anal_by + f1.sha256 RETURN f1\n",
                 sha256Sample, function.getSha256(), (int) less, (int) more);
+        return query;
+    }
+
+    public String createQueryGetSimilHashes(Function function, String sha256Sample) {
+        String query = String.format("MATCH (f:Function), (s:Sample {sha256:'%s'}) WHERE ", sha256Sample);
+        List<Long> minHashes = function.getMinHashes();
+        for (int i = 0; i < minHashes.size(); i++) {
+
+            Long hash = minHashes.get(i);
+            if (i == minHashes.size() - 1) {
+                query += String.format("%d in f.minHashes ", hash);
+            } else {
+                query += String.format("%d in f.minHashes OR ", hash);
+            }
+        }
+        query += String.format("AND NOT (s)-[:CALLS]->(f) ");
+        query += "RETURN f";
         return query;
     }
 
