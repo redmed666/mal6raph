@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +156,7 @@ public class FileUploadController {
                     nodes.add(function);
                     source = i++;
                 }
-                rels.add(map("sid", source, "tid", target, "_color", "beige"));
+                rels.add(map("sid", source, "tid", target, "_color", "chocolate"));
             }
         }
         return gson.toJson(map("nodes", nodes, "links", rels));
@@ -168,7 +169,6 @@ public class FileUploadController {
         String result = "";
 
         List<Function> functions = new ArrayList<>();
-        List<List<Function>> functionsSimilSize = new ArrayList<>();
 
         String query = this.neo4jDb.createQueryGetFunctions(sha256Sample);
         Iterator<Map<String, Object>> rFunctions = this.neo4jDb.sendQuery(query);
@@ -184,6 +184,7 @@ public class FileUploadController {
             function.setOps(ops);
             function.setSize((Long) f.get("size"));
             function.setMinHashes((List<Long>) f.get("minHashes"));
+            function.setNmbBands(config.get("NMB_BANDS").getAsInt());
             functions.add(function);
 
             String queryFctSimil = neo4jDb.createQueryGetSimilHashes(function, sha256Sample);
@@ -191,27 +192,29 @@ public class FileUploadController {
             Iterator<Map<String, Object>> rFunctionSameHash = neo4jDb.sendQuery(queryFctSimil);
             List<Function> functionsSameHash = new ArrayList<Function>();
             Analyzer anal = new Analyzer();
+            Map<String, Float> similarities = new HashMap<>();
 
             while (rFunctionSameHash.hasNext()) {
                 Map<String, Object> rFunctionHash = rFunctionSameHash.next();
                 Map<String, Object> fHash = (Map<String, Object>) rFunctionHash.get("f2");
-
-                Function fctSameHash = new Function();
-                fctSameHash.setMd5((String) fHash.get("md5"));
-                fctSameHash.setSha256((String) fHash.get("sha256"));
-                List<String> opsFctSimil = (List<String>) fHash.get("ops");
-                fctSameHash.setOps(opsFctSimil);
-                List<Long> minHashes = (List<Long>) fHash.get("minHashes");
-                fctSameHash.setMinHashes(minHashes);
-
-                functionsSameHash.add(fctSameHash);
+                Function functionSameHash = new Function();
+                functionSameHash.setSha256((String) fHash.get("sha256"));
+                functionSameHash.setMinHashes((List<Long>) fHash.get("minHashes"));
+                functionsSameHash.add(functionSameHash);
             }
             if (!functionsSameHash.isEmpty()) {
-                for (Function fn : functionsSameHash) {
-                    String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), fn.getSha256(),
-                            1.0f);
+                try {
+                    anal.analyzeSimil(function, functions, similarities, config);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+                for (Map.Entry<String, Float> entry : similarities.entrySet()) {
+                    String queryFcnSimil = neo4jDb.createQueryFunctionsSimilar(function.getSha256(), entry.getKey(),
+                            entry.getValue());
                     neo4jDb.sendQuery(queryFcnSimil);
                 }
+
             }
         }
 
@@ -243,7 +246,7 @@ public class FileUploadController {
                     sourceFctSrc = i++;
                 }
                 // rel = CALLS from sampleSrc to fctSampleSrc
-                rels.add(map("sid", sourceFctSrc, "tid", target, "_color", "beige", "name", "CALLS"));
+                rels.add(map("sid", sourceFctSrc, "tid", target, "_color", "chocolate", "name", "CALLS"));
 
                 Map<String, Object> fctTrg = map("name", (String) fctsSampleTrg.get(j), "label", "function", "_color",
                         "cornflowerblue");
@@ -263,7 +266,7 @@ public class FileUploadController {
                     sourceSampleTarg = i++;
                 }
                 // rel = CALLS from SampleTarg to fctSampleTarg
-                rels.add(map("sid", sourceSampleTarg, "tid", sourceFctTarg, "_color", "beige", "name", "CALLS"));
+                rels.add(map("sid", sourceSampleTarg, "tid", sourceFctTarg, "_color", "chocolate", "name", "CALLS"));
 
             }
 

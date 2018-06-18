@@ -74,8 +74,8 @@ public class Analyzer {
         return sample;
     }
 
-    public void analyzeSimil(Function source, List<Function> fromDb, List<Map<String, Float>> similarities,
-            JsonObject config) throws Exception {
+    public void analyzeSimil(Function source, List<Function> fromDb, Map<String, Float> similarities, JsonObject config)
+            throws Exception {
         String sha256Max = "";
 
         ConcurrentLinkedQueue<Function> queue = new ConcurrentLinkedQueue<Function>();

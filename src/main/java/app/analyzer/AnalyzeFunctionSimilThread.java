@@ -1,7 +1,5 @@
 package app.analyzer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,11 +11,11 @@ public class AnalyzeFunctionSimilThread implements Runnable {
     private ConcurrentLinkedQueue<Function> queue;
     private Function function;
     private List<String> ops;
-    private List<Map<String, Float>> similarities;
+    private Map<String, Float> similarities;
     private Float thresholdSimil;
 
     AnalyzeFunctionSimilThread(ConcurrentLinkedQueue<Function> queue, Function functionFromSample,
-            List<Map<String, Float>> similarities, Float thresholdSimil) {
+            Map<String, Float> similarities, Float thresholdSimil) {
         this.queue = queue;
         this.function = functionFromSample;
         this.ops = functionFromSample.getOps();
@@ -32,19 +30,18 @@ public class AnalyzeFunctionSimilThread implements Runnable {
                 List<Long> minHashes = function.getMinHashes();
                 List<Long> minHashesDb = fctFromDb.getMinHashes();
                 float result = 0.0f;
+                int score = 0;
 
                 for (int i = 0; i < minHashes.size(); i++) {
                     if (minHashes.get(i) == minHashesDb.get(i)) {
-                        result += 1.0f;
+                        score += 1;
                     }
                 }
 
-                result = result / minHashes.size();
+                result = (float) score / minHashes.size();
 
                 if (result > thresholdSimil) {
-                    Map<String, Float> simil = new HashMap<String, Float>();
-                    simil.put(fctFromDb.getSha256(), result);
-                    similarities.add(simil);
+                    similarities.put(fctFromDb.getSha256(), result);
                 }
             }
         } catch (Exception e) {

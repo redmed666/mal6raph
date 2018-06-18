@@ -112,6 +112,12 @@ public class Model implements AutoCloseable {
                     query += String.format("SET function_%s.already_anal_by = []\n", fnSha256);
                     query += String.format("SET function_%s.minHashes = %s\n", fnSha256,
                             function.getMinHashes().toString());
+                    for (int i = 0; i < function.getNmbBands(); i++) {
+                        int sizeBand = function.getMinHashes().size() / function.getNmbBands();
+
+                        query += String.format("SET function_%s.band_%d = %s\n", fnSha256, i,
+                                function.getMinHashes().subList(i * sizeBand, (i + 1) * sizeBand).toString());
+                    }
                     query += String.format("CREATE (sample_%s)-[:CALLS]->(function_%s)\n", sample.getSha256(),
                             fnSha256);
                 }
@@ -165,11 +171,26 @@ public class Model implements AutoCloseable {
     }
 
     public String createQueryGetSimilHashes(Function function, String sha256Sample) {
-        String query = String.format(
-                "MATCH (f1:Function {sha256:'%s'}), (s:Sample {sha256:'%s'}), (f2:Function) WHERE f2.minHashes = f1.minHashes",
+        String query = String.format("MATCH (f1:Function {sha256:'%s'}), (s:Sample {sha256:'%s'}), (f2:Function) WHERE",
                 function.getSha256(), sha256Sample);
-        query += String.format(" AND NOT (s)-[:CALLS]->(f2) ");
-        query += " RETURN f2";
+        query += String.format(" NOT (s)-[:CALLS]->(f2) ");
+        query += String.format(" AND (");
+        for (int i = 0; i < function.getNmbBands(); i++) {
+            if (i != function.getNmbBands() - 1) {
+                query += String.format("f1.band_%d = f2.band_%d OR ", i, i);
+            } else {
+                query += String.format("f1.band_%d = f2.band_%d)", i, i);
+            }
+        }
+        query += " RETURN f2\n";
+
+        return query;
+    }
+
+    public String createQueryGetScore(Function functionSrc, Function functionTrg) {
+        String query = String.format(
+                "MATCH (f1:Function {sha256:'%s'}), (f2:Function {sha256:'%s'}) RETURN length(FILTER(hash in f2.minHashes WHERE hash in f1.minHashes)) AS score\n",
+                functionSrc.getSha256(), functionTrg.getSha256());
         return query;
     }
 

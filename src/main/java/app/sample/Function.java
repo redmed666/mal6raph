@@ -11,6 +11,7 @@ public class Function {
     private List<String> ops;
     private int offset;
     private List<Long> minHashes;
+    private int nmbBands;
 
     /**
      * @param arch the arch to set
@@ -122,6 +123,20 @@ public class Function {
      */
     public void setMinHashes(List<Long> minHashes) {
         this.minHashes = minHashes;
+    }
+
+    /**
+     * @return the nmbBands
+     */
+    public int getNmbBands() {
+        return nmbBands;
+    }
+
+    /**
+     * @param nmbBands the nmbBands to set
+     */
+    public void setNmbBands(int nmbBands) {
+        this.nmbBands = nmbBands;
     }
 
 }
