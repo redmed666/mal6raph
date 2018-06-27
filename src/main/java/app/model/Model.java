@@ -112,9 +112,8 @@ public class Model implements AutoCloseable {
                     query += String.format("SET function_%s.already_anal_by = []\n", fnSha256);
                     query += String.format("SET function_%s.minHashes = %s\n", fnSha256,
                             function.getMinHashes().toString());
+                    int sizeBand = function.getMinHashes().size() / function.getNmbBands();
                     for (int i = 0; i < function.getNmbBands(); i++) {
-                        int sizeBand = function.getMinHashes().size() / function.getNmbBands();
-
                         query += String.format("SET function_%s.band_%d = %s\n", fnSha256, i,
                                 function.getMinHashes().subList(i * sizeBand, (i + 1) * sizeBand).toString());
                     }

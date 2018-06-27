@@ -33,13 +33,12 @@ public class AnalyzeFunctionSimilThread implements Runnable {
                 int score = 0;
 
                 for (int i = 0; i < minHashes.size(); i++) {
-                    if (minHashes.get(i) == minHashesDb.get(i)) {
+                    if (minHashes.contains(minHashesDb.get(i))) {
                         score += 1;
                     }
                 }
 
                 result = (float) score / minHashes.size();
-
                 if (result > thresholdSimil) {
                     similarities.put(fctFromDb.getSha256(), result);
                 }
