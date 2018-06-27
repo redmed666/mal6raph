@@ -2,13 +2,13 @@
     "STATIC_PATH": "/static/",
     "USER": "neo4j",
     "PASSWORD": "THIS_IS_ONLY_A_TEST",
-    "THRESHOLD_SIMILARITY": 0.60,
-    "THRESHOLD_FCT_SIZE": 300,
+    "THRESHOLD_SIMILARITY": 0.50,
+    "THRESHOLD_FCT_SIZE": 250,
     "THRESHOLD_STR_SIZE": 20,
-    "NUMBER_THREADS": 10,
+    "NUMBER_THREADS": 15,
     "DIFF_SIZE_FCT": 0.05,
     "NEO4JURI": "bolt://localhost:7687",
     "PORT": 5000,
     "HOST": "0.0.0.0",
-    "NMB_BANDS": 20
+    "NMB_BANDS": 40
 }
