@@ -174,6 +174,10 @@ public class Model implements AutoCloseable {
         String query = String.format("MATCH (f1:Function {sha256:'%s'}), (s:Sample {sha256:'%s'}), (f2:Function) WHERE",
                 function.getSha256(), sha256Sample);
         query += String.format(" NOT (s)-[:CALLS]->(f2) ");
+        query += String.format(" AND (s)-[:CALLS]->(f1) ");
+        query += String.format(" AND NOT (f1)-[:SIMILAR_TO]-(f2) ");
+        query += String.format(" AND NOT f2.sha256 IN f1.already_anal_by ");
+        query += String.format(" AND NOT f1.sha256 in f2.already_anal_by ");
         query += String.format(" AND (");
         for (int i = 0; i < function.getNmbBands(); i++) {
             if (i != function.getNmbBands() - 1) {
@@ -182,6 +186,8 @@ public class Model implements AutoCloseable {
                 query += String.format("f1.band_%d = f2.band_%d)", i, i);
             }
         }
+        query += " SET f1.already_anal_by = f1.already_anal_by + f2.sha256 ";
+        query += " SET f2.already_anal_by = f2.already_anal_by + f1.sha256 ";
         query += " RETURN f2\n";
 
         return query;
